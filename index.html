@@ -102,7 +102,7 @@ function renderCurrentCard(){if(sessionDone){document.getElementById('promptWord
 function expectedFor(w){return direction==='deko'?w.ko:w.de}
 function submitAnswer(answer,mode='text'){if(sessionDone||!session.length)return;
                                           const w=session[sessionIndex],expected=expectedFor(w),given=String(answer??'').trim(),good=matches(given,expected);
-                                          if(!given){showToast('Bitte gib eine Antword ein.');return}score(w,good,mode);
+                                          if(!given){showToast('Bitte gib eine Antwort ein.');return}score(w,good,mode);
                                           feedback={given,expected,good,mode};
                                           say(w.ko);
                                           const last=sessionIndex===session.length-1;
