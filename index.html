@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script src="config.js"></script>
-<title>MyHangugoTrainer – Koreanisch lernen</title>
+<title>MyHangugoTrainer v2 – Koreanisch lernen</title>
 <style>
 :root{--bg:#f4f6fb;--panel:#fff;--ink:#182033;--muted:#697386;--line:#e5e9f2;--accent:#5b5bd6;--accent2:#4545b8;--good:#16845b;--bad:#c0394b;--soft:#eef0ff;--shadow:0 12px 34px rgba(28,39,74,.08)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -84,7 +84,13 @@ function norm(s){return String(s??'').normalize('NFKC').trim().toLowerCase().rep
 function getProg(w){if(!progress[w.ko])progress[w.ko]={right:0,wrong:0,streak:0,level:0,last_seen:'',speaking_right:0,speaking_wrong:0};let p=progress[w.ko];for(const [k,v] of Object.entries({right:0,wrong:0,streak:0,level:0,last_seen:'',speaking_right:0,speaking_wrong:0}))if(p[k]===undefined)p[k]=v;return p}
 function matches(a,b){const x=norm(a),y=norm(b);if(!x||!y)return false;if(x===y)return true;let d=levenshtein(x,y),ratio=1-d/Math.max(x.length,y.length);if(y.length<=2)return ratio>=.90;if(y.length<=4)return ratio>=.86;if(y.length<=6)return ratio>=.82;return ratio>=.78}
 function levenshtein(a,b){let row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){let old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old}}return row[b.length]}
-function choose(list,n){let pool=[];list.forEach(w=>{let p=getProg(w),weight=Math.max(2,8-(+p.level||0))+Math.min(6,+p.wrong||0);for(let i=0;i<weight;i++)pool.push(w)});shuffle(pool);let out=[],seen=new Set();for(const w of pool){if(!seen.has(w.ko)){out.push(w);seen.add(w.ko)}if(out.length>=Math.min(n,list.length))break}for(const w of shuffle([...list]))if(out.length<Math.min(n,list.length)&&!seen.has(w.ko)){out.push(w);seen.add(w.ko)}return out}
+function choose(list,n){let pool=[];
+                        list.forEach(w=>{let p=getProg(w),weight=Math.max(1,6-(+p.level||0))+Math.min(2,(+p.wrong-p.right)||0);
+                                         for(let i=0;i<weight;i++)pool.push(w)});
+                        shuffle(pool);let out=[],seen=new Set();
+                        for(const w of pool){if(!seen.has(w.ko)){out.push(w);
+                                                                 seen.add(w.ko)}if(out.length>=Math.min(n,list.length))break}for(const w of shuffle([...list]))if(out.length<Math.min(n,list.length)&&!seen.has(w.ko)){out.push(w);
+                                                                                                                                                                                                                       seen.add(w.ko)}return out}
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function categories(){return [...new Set(vocab.map(w=>w.category||'Sonstiges'))].sort((a,b)=>a.localeCompare(b,'de'))}
 function escapeHTML(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -134,7 +140,16 @@ document.getElementById('vocabList').onclick=e=>{const del=e.target.closest('[da
 function renderProgress(){const ps=vocab.map(w=>({w,p:getProg(w)}));let right=0,wrong=0;ps.forEach(x=>{right+=+x.p.right||0;wrong+=+x.p.wrong||0});document.getElementById('progressRight').textContent=right;document.getElementById('progressWrong').textContent=wrong;document.getElementById('progressAccuracy').textContent=(right+wrong?Math.round(100*right/(right+wrong)):0)+'%';document.getElementById('progressList').innerHTML=ps.map(({w,p})=>`<div class="vocab-row"><div><strong>${escapeHTML(w.de)}</strong><div class="small muted">${escapeHTML(w.ko)}</div></div><div><span class="pill">Level ${p.level}/5</span></div><div class="small muted">✓ ${p.right} · ✗ ${p.wrong} · Serie ${p.streak}</div><div class="small muted">${p.last_seen?new Date(p.last_seen).toLocaleDateString('de-DE'):'Noch nicht geübt'}</div></div>`).join('')}
 document.getElementById('resetProgress').onclick=()=>{if(confirm('Den gesamten Lernstand wirklich zurücksetzen?')){progress={};persist();renderProgress();renderHome();showToast('Lernstand zurückgesetzt.')}};
 function newTest(){const cat=document.getElementById('testCategory').value||'Alle',list=cat==='Alle'?vocab:vocab.filter(w=>w.category===cat);if(!list.length){document.getElementById('testPrompt').textContent='Keine Vokabeln';return}testCurrent=list[Math.floor(Math.random()*list.length)];testAnswered=false;const correct=testCurrent.ko,wrong=shuffle(vocab.filter(w=>w.ko!==correct)).slice(0,3).map(w=>w.ko);const opts=shuffle([correct,...wrong]);document.getElementById('testPrompt').textContent=testCurrent.de;document.getElementById('testFeedback').classList.add('hidden');document.getElementById('testChoices').innerHTML=opts.map(opt=>`<button data-choice="${escapeHTML(opt)}">${escapeHTML(opt)}</button>`).join('');document.getElementById('testChoices').querySelectorAll('button').forEach(b=>b.onclick=()=>answerTest(b.dataset.choice));}
-function answerTest(choice){if(testAnswered||!testCurrent)return;testAnswered=true;const good=choice===testCurrent.ko;if(good)testStats.right++;else testStats.wrong++;score(testCurrent,good,'text');persist();const el=document.getElementById('testFeedback');el.className='feedback '+(good?'good':'bad');el.innerHTML=`<div>${good?'✓ Richtig!':'✗ Richtig wäre: '+escapeHTML(testCurrent.ko)}</div><div class="small muted">${escapeHTML(testCurrent.de)} · ${escapeHTML(testCurrent.roman||'')}</div>`;renderHome()}
+function answerTest(choice){if(testAnswered||!testCurrent)return;
+                            testAnswered=true;
+                            const good=choice===testCurrent.ko;
+                            say(testCurrent.ko);
+                            if(good)testStats.right++;else testStats.wrong++;
+                            score(testCurrent,good,'text');persist();
+                            const el=document.getElementById('testFeedback');
+                            el.className='feedback '+(good?'good':'bad');
+                            el.innerHTML=`<div>${good?'✓ Richtig!':'✗ Richtig wäre: '+escapeHTML(testCurrent.ko)}</div><div class="small muted">${escapeHTML(testCurrent.de)} · ${escapeHTML(testCurrent.roman||'')}</div>`;
+                            renderHome()}
 document.getElementById('testCategory').onchange=newTest;document.getElementById('nextTest').onclick=newTest;
 function downloadJSON(name,data){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
 function exportVocab(){downloadJSON('vokabeln_koreanisch.json',vocab);showToast('Vokabeldatei exportiert.')}
