@@ -7,7 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script src="config.js"></script>
-<title>MyHangugoTrainer v5 – Koreanisch lernen</title>
+<title>MyHangugoTrainer v3 – Koreanisch lernen</title>
 <style>
 :root{--bg:#f4f6fb;--panel:#fff;--ink:#182033;--muted:#697386;--line:#e5e9f2;--accent:#5b5bd6;--accent2:#4545b8;--good:#16845b;--bad:#c0394b;--soft:#eef0ff;--shadow:0 12px 34px rgba(28,39,74,.08)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -18,7 +18,7 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:11px
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><div class="logo">한</div><div><strong>MyHangugoTrainer</strong><small>[v5 - 27/10/2026]</small></div></div>
+    <div class="brand"><div class="logo">한</div><div><strong>MyHangugoTrainer</strong><small>[v3 - 21/10/2026]</small></div></div>
     <nav class="nav" id="nav">
       <button class="active" data-page="home">⌂ &nbsp; Start</button>
       <button data-page="study">▣ &nbsp; Lernen</button>
@@ -63,7 +63,19 @@ button,input,select{font:inherit}button{border:0;border-radius:12px;padding:11px
         <button id="saveVocab">Vokabel speichern</button><div class="notice">Bei einer bestehenden Kategorie wird das neue Wort direkt nach dem letzten Wort dieser Kategorie einsortiert. Änderungen werden im Browser gespeichert; zum Aktualisieren einer JSON-Datei bitte exportieren.</div>
       </div><div class="card"><h3 class="section-title">Vokabeldatei laden</h3><p class="muted">Du kannst deine bestehende <code>vokabeln_koreanisch.json</code> laden. Die Datei wird nur lokal im Browser verarbeitet.</p><button class="secondary" onclick="document.getElementById('vocabImport').click()">Vokabel-JSON laden</button><input class="hidden" id="vocabImport" type="file" accept=".json,application/json"><p class="small muted">Der Import ersetzt die aktuelle Vokabelliste. Exportiere vorher eine Sicherung, wenn du Änderungen behalten möchtest.</p></div></div>
     </section>
-    <section id="page-vocab" class="hidden"><div class="card"><div class="row"><div class="field"><label for="vocabSearch">Suchen</label><input id="vocabSearch" placeholder="Deutsch, Koreanisch oder Kategorie …"></div><div class="field"><label for="vocabFilter">Kategorie filtern</label><select id="vocabFilter"></select></div></div><div class="row" style="margin-bottom:14px"><button class="secondary" onclick="exportVocab()">Vokabeln exportieren</button><button class="secondary" onclick="document.getElementById('vocabImport').click()">JSON laden</button></div><div class="list" id="vocabList"></div></div></section>
+    <section id="page-vocab" class="hidden"><div class="card"><div class="row"><div class="field"><label for="vocabSearch">Suchen</label><input id="vocabSearch" placeholder="Deutsch, Koreanisch oder Kategorie …"></div><div class="field"><label for="vocabFilter">Kategorie filtern</label><select id="vocabFilter"></select></div></div><div class="row" style="margin-bottom:14px"><button class="secondary" onclick="exportVocab()">Vokabeln exportieren</button><button class="secondary" onclick="document.getElementById('vocabImport').click()">JSON laden</button></div><div class="list" id="vocabList"></div>
+      <div id="vocabEditor" class="card hidden" style="margin-top:18px;background:#f8f9ff" aria-label="Vokabel bearbeiten">
+        <h3 class="section-title" id="editorTitle">Vokabel bearbeiten</h3>
+        <div class="grid two-col"><div>
+          <div class="field"><label for="editDe">Deutsch</label><input id="editDe"></div>
+          <div class="field"><label for="editKo">Koreanisch (한글)</label><input id="editKo" lang="ko"></div>
+          <div class="field"><label for="editRoman">Umschrift</label><input id="editRoman"></div>
+        </div><div>
+          <div class="field"><label for="editCategory">Zielkategorie (bestehende auswählen oder neue eingeben)</label><input id="editCategory" list="categoryOptions"></div>
+          <p class="small muted">Speichern bearbeitet die Vokabel. Verschieben ändert nur ihre Kategorie. Kopieren legt eine zusätzliche Vokabel in der Zielkategorie an.</p>
+        </div></div>
+        <div class="row" style="margin-top:12px"><button id="editSave">Änderungen speichern</button><button id="editMove" class="secondary">Verschieben</button><button id="editCopy" class="secondary">Kopieren</button><button id="editCancel" class="secondary">Abbrechen</button></div>
+      </div></div></section>
     <section id="page-progress" class="hidden"><div class="grid stats"><div class="card stat"><div class="num" id="progressRight">0</div><div class="label">Richtig</div></div><div class="card stat"><div class="num" id="progressWrong">0</div><div class="label">Falsch</div></div><div class="card stat"><div class="num" id="progressAccuracy">0%</div><div class="label">Trefferquote</div></div></div><div class="card"><h2 class="section-title">Lernfortschritt pro Wort</h2><div class="list" id="progressList"></div><div class="row" style="margin-top:16px"><button class="secondary" onclick="exportProgress()">Fortschritt exportieren</button><button class="danger" id="resetProgress">Lernstand zurücksetzen</button></div></div></section>
     <section id="page-tests" class="hidden"><div class="card"><h2 class="section-title">Multiple-Choice-Test</h2><p class="muted">Wähle die passende Übersetzung. Der Test speichert richtige und falsche Antworten in deinem Lernstand.</p><div class="field"><label for="testCategory">Kategorie</label><select id="testCategory"></select></div><div class="prompt"><div><div class="muted small">Was bedeutet dieses Wort?</div><div class="word" id="testPrompt">Bereit?</div></div></div><div class="choice-list" id="testChoices"></div><div id="testFeedback" class="feedback hidden"></div><button style="margin-top:14px" id="nextTest">Nächste Frage</button></div></section>
   </main>
@@ -157,9 +169,34 @@ document.getElementById('speechBtn').onclick=()=>{const SR=window.SpeechRecognit
 function scoreText(a,b){return matches(a,b)?2:1-levenshtein(norm(a),norm(b))/Math.max(norm(a).length,norm(b).length,1)}
 function fillDatalist(){document.getElementById('categoryOptions').innerHTML=categories().map(c=>`<option value="${escapeHTML(c)}">`).join('')}
 document.getElementById('saveVocab').onclick=()=>{const de=document.getElementById('newDe').value.trim(),ko=document.getElementById('newKo').value.trim(),roman=document.getElementById('newRoman').value.trim(),category=document.getElementById('newCategory').value.trim()||'Sonstiges';if(!de||!ko){showToast('Deutsch und Koreanisch müssen ausgefüllt sein.');return}if(vocab.some(w=>norm(w.ko)===norm(ko))){showToast('Dieses koreanische Wort ist bereits vorhanden.');return}const item={de,ko,roman,category};let last=-1;vocab.forEach((w,i)=>{if((w.category||'Sonstiges')===category)last=i});if(last>=0)vocab.splice(last+1,0,item);else vocab.push(item);persist();['newDe','newKo','newRoman'].forEach(id=>document.getElementById(id).value='');showToast('Vokabel gespeichert und einsortiert.');fillCategorySelects();fillDatalist();renderHome()};
-function renderVocab(){fillCategorySelects();const q=norm(document.getElementById('vocabSearch').value),cat=document.getElementById('vocabFilter').value||'Alle';const list=vocab.filter(w=>(cat==='Alle'||w.category===cat)&&(!q||norm(w.de+' '+w.ko+' '+w.roman+' '+w.category).includes(q)));document.getElementById('vocabList').innerHTML=list.length?list.map(w=>`<div class="vocab-row"><div><strong>${escapeHTML(w.de)}</strong><div class="small muted">${escapeHTML(''||'')}</div></div><div class="ko" role="button" tabindex="0" data-say="${escapeHTML(w.ko)}">${escapeHTML(w.ko)}</div><div><span class="pill">${escapeHTML(w.category||'Sonstiges')}</span></div><button class="secondary" data-delete="${escapeHTML(w.ko)}">Löschen</button></div>`).join(''):'<div class="empty">Keine Vokabeln gefunden.</div>'}
+let editVocabIndex=-1;
+function refreshAfterVocabChange(){persist();fillCategorySelects();fillDatalist();renderVocab();renderHome();if(page==='progress')renderProgress()}
+function insertAfterCategory(item,category){let last=-1;vocab.forEach((w,i)=>{if((w.category||'Sonstiges')===category)last=i});vocab.splice(last+1,0,item)}
+function openVocabEditor(index){const w=vocab[index];if(!w)return;editVocabIndex=index;document.getElementById('editDe').value=w.de||'';document.getElementById('editKo').value=w.ko||'';document.getElementById('editRoman').value=w.roman||'';document.getElementById('editCategory').value=w.category||'Sonstiges';fillDatalist();document.getElementById('editorTitle').textContent='Vokabel bearbeiten: '+w.de;document.getElementById('vocabEditor').classList.remove('hidden');document.getElementById('vocabEditor').scrollIntoView({behavior:'smooth',block:'nearest'})}
+function closeVocabEditor(){editVocabIndex=-1;document.getElementById('vocabEditor').classList.add('hidden')}
+function editValues(){return {de:document.getElementById('editDe').value.trim(),ko:document.getElementById('editKo').value.trim(),roman:document.getElementById('editRoman').value.trim(),category:document.getElementById('editCategory').value.trim()||'Sonstiges'}}
+function saveVocabEdit(mode){const old=vocab[editVocabIndex];if(!old){closeVocabEditor();return}const v=editValues();if(!v.category){showToast('Bitte Zielkategorie angeben.');return}
+  if(mode==='save'){
+    if(!v.de||!v.ko){showToast('Deutsch und Koreanisch müssen ausgefüllt sein.');return}
+    if(vocab.some((w,i)=>i!==editVocabIndex&&norm(w.ko)===norm(v.ko)&&w.category===v.category)){showToast('Diese Vokabel existiert bereits in der Zielkategorie.');return}
+    const oldKo=old.ko;Object.assign(old,v);
+    if(oldKo!==v.ko&&progress[oldKo]){if(!progress[v.ko])progress[v.ko]=structuredClone(progress[oldKo]);if(!vocab.some((w,i)=>i!==editVocabIndex&&w.ko===oldKo))delete progress[oldKo]}
+    showToast('Vokabel aktualisiert.');
+  }else{
+    const target=v.category;
+    if(mode==='move'&&target===(old.category||'Sonstiges')){showToast('Die Vokabel ist bereits in dieser Kategorie.');return}
+    if(vocab.some((w,i)=>i!==editVocabIndex&&w.category===target&&norm(w.ko)===norm(old.ko))){showToast('Diese Vokabel ist in der Zielkategorie bereits vorhanden.');return}
+    if(mode==='move'){const item=vocab.splice(editVocabIndex,1)[0];item.category=target;insertAfterCategory(item,target);showToast('Vokabel verschoben.')}else{insertAfterCategory({...old,category:target},target);showToast('Vokabel kopiert. Lernstand wird für identische koreanische Wörter gemeinsam geführt.')}
+  }
+  closeVocabEditor();refreshAfterVocabChange();
+}
+document.getElementById('editSave').onclick=()=>saveVocabEdit('save');
+document.getElementById('editMove').onclick=()=>saveVocabEdit('move');
+document.getElementById('editCopy').onclick=()=>saveVocabEdit('copy');
+document.getElementById('editCancel').onclick=closeVocabEditor;
+function renderVocab(){fillCategorySelects();const q=norm(document.getElementById('vocabSearch').value),cat=document.getElementById('vocabFilter').value||'Alle';const list=vocab.map((w,i)=>({w,i})).filter(({w})=>(cat==='Alle'||(w.category||'Sonstiges')===cat)&&(!q||norm(w.de+' '+w.ko+' '+w.roman+' '+w.category).includes(q)));document.getElementById('vocabList').innerHTML=list.length?list.map(({w,i})=>`<div class="vocab-row"><div><strong>${escapeHTML(w.de)}</strong><div class="small muted">${escapeHTML(w.roman||'')}</div></div><div class="ko" role="button" tabindex="0" data-say="${escapeHTML(w.ko)}">${escapeHTML(w.ko)}</div><div><span class="pill">${escapeHTML(w.category||'Sonstiges')}</span></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="secondary" data-edit-index="${i}">Bearbeiten</button><button class="danger" data-delete-index="${i}">Löschen</button></div></div>`).join(''):'<div class="empty">Keine Vokabeln gefunden.</div>'}
 document.getElementById('vocabSearch').oninput=renderVocab;document.getElementById('vocabFilter').onchange=renderVocab;
-document.getElementById('vocabList').onclick=e=>{const del=e.target.closest('[data-delete]');if(del){const ko=del.dataset.delete;if(confirm('Diese Vokabel wirklich löschen?')){vocab=vocab.filter(w=>w.ko!==ko);persist();renderVocab();renderHome()}return}const sayEl=e.target.closest('[data-say]');if(sayEl)say(sayEl.dataset.say)};
+document.getElementById('vocabList').onclick=e=>{const edit=e.target.closest('[data-edit-index]');if(edit){openVocabEditor(+edit.dataset.editIndex);return}const del=e.target.closest('[data-delete-index]');if(del){const index=+del.dataset.deleteIndex;if(confirm('Diese Vokabel wirklich löschen?')){vocab.splice(index,1);closeVocabEditor();refreshAfterVocabChange()}return}const sayEl=e.target.closest('[data-say]');if(sayEl)say(sayEl.dataset.say)};
 function renderProgress(){const ps=vocab.map(w=>({w,p:getProg(w)}));let right=0,wrong=0;ps.forEach(x=>{right+=+x.p.right||0;wrong+=+x.p.wrong||0});document.getElementById('progressRight').textContent=right;document.getElementById('progressWrong').textContent=wrong;document.getElementById('progressAccuracy').textContent=(right+wrong?Math.round(100*right/(right+wrong)):0)+'%';document.getElementById('progressList').innerHTML=ps.map(({w,p})=>`<div class="vocab-row"><div><strong>${escapeHTML(w.de)}</strong><div class="small muted">${escapeHTML(w.ko)}</div></div><div><span class="pill">Level ${p.level}/5</span></div><div class="small muted">✓ ${p.right} · ✗ ${p.wrong} · Serie ${p.streak}</div><div class="small muted">${p.last_seen?new Date(p.last_seen).toLocaleDateString('de-DE'):'Noch nicht geübt'}</div></div>`).join('')}
 document.getElementById('resetProgress').onclick=()=>{if(confirm('Den gesamten Lernstand wirklich zurücksetzen?')){progress={};persist();renderProgress();renderHome();showToast('Lernstand zurückgesetzt.')}};
 function newTest(){const cat=document.getElementById('testCategory').value||'Alle',list=cat==='Alle'?vocab:vocab.filter(w=>w.category===cat);if(!list.length){document.getElementById('testPrompt').textContent='Keine Vokabeln';return}testCurrent=list[Math.floor(Math.random()*list.length)];testAnswered=false;const correct=testCurrent.ko,wrong=shuffle(vocab.filter(w=>w.ko!==correct)).slice(0,3).map(w=>w.ko);const opts=shuffle([correct,...wrong]);document.getElementById('testPrompt').textContent=testCurrent.de;document.getElementById('testFeedback').classList.add('hidden');document.getElementById('testChoices').innerHTML=opts.map(opt=>`<button data-choice="${escapeHTML(opt)}">${escapeHTML(opt)}</button>`).join('');document.getElementById('testChoices').querySelectorAll('button').forEach(b=>b.onclick=()=>answerTest(b.dataset.choice));}
